@@ -13,5 +13,7 @@ router.get('/getbooks' , bookController.getBookList);
 router.get('/booksbycbhagat' , bookController.getbooksbycbhagat);
 router.get('/authorandupdateprice' , bookController.authornameandupdateprice);
 router.get('/aname50-100price' , bookController.getanameb50t100);
+router.get('/books/:authid' , bookController.booksbyauthorid);
+router.get('/authorsabove50' , bookController.authorabove50);
 
 module.exports = router
