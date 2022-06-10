@@ -1,10 +1,11 @@
+
 const authorModel = require("../models/authorModel")
 const bookModel= require("../models/bookModel")
 const publisherModel = require('../models/publisherModel');
 
 const createBook= async function (req, res) {
     let bookdata = req.body
-    let authid = bookdata.author
+    let authid = bookdata.autho
     let publishid = bookdata.publisher
     let auth = false
     let publish = false
@@ -49,10 +50,18 @@ const getBooksWithAllDetais = async function (req, res) {
 
 const updateBooksDetails = async function(req , res){
     let allBooks = await bookModel.find().populate('author').populate('publisher', null, {name : {$in: ['HarperCollins','Pengiun']}});
+    let filterIds = []
     allBooks.forEach(obj => {
-        if(obj.publisher != null) obj.isHardCover = true
+        if(obj.publisher != null){
+            filterIds.push(String(obj._id));
+        }
     })
-    res.send({msg : "updated successfully"});
+    let updatedDetails = await bookModel.updateMany({_id : {$in:filterIds}},{$set:{isHardCover: true}});
+
+    let filteredauthorId = await authorModel.find({rating : {$gt : 3.5}}).select({_id:1})
+    let idList=filteredauthorId.map(obj => String(obj._id))
+    let priceUpdateDetails = await bookModel.updateMany({'author':{$in:idList}},{$inc:{price:10}})
+    res.send({coverupadte : updatedDetails , priceupdate: priceUpdateDetails})
 }
 
 module.exports.createBook= createBook
